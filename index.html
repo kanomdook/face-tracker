@@ -57,27 +57,48 @@
                         ctx.drawImage(_video, 0, 0, _canvas.width, _canvas.height);
                         var img = new Image();
                         img.src = _canvas.toDataURL("image/jpeg", 0.75);
-                        console.log(img.src);
-                        var uriBase = 'https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups?top=1000';
+                        var b = makeblob(img.src);
+                        var sourceImageUrl = 'http://www.online-idol.com/wp-content/uploads/2017/09/t-%E0%B8%8D%E0%B8%B2%E0%B8%8D%E0%B9%88%E0%B8%B2-%E0%B8%AD%E0%B8%B8%E0%B8%A3%E0%B8%B1%E0%B8%AA%E0%B8%A2%E0%B8%B2-%E0%B8%AA%E0%B9%80%E0%B8%9B%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B8%9A%E0%B8%B1%E0%B8%99%E0%B8%94%E0%B9%8C.jpg';
+                        var uriBase = 'https://southeastasia.api.cognitive.microsoft.com/face/v1.0';
                         $.ajax({
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Ocp-Apim-Subscription-Key': '46547dfcc3d3423c94cce3949093462b'
+                            url: uriBase + '/detect',
+                            beforeSend: function (xhrObj) {
+                                xhrObj.setRequestHeader("Content-Type", "application/json");
+                                xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key", '46547dfcc3d3423c94cce3949093462b');
                             },
-                            type: 'GET',
-                            url: uriBase,
-                            data: {},
-                            success: function (res) {
-                                // tracker.run();
-                                console.log(res);
-                            },
-                            dataType: 'json'
-                        });
+                            type: "POST",
+                            data: '{"url": ' + '"' + sourceImageUrl + '"}',
+                        })
+                            .done(function (data) {
+                                console.log(data);
+                            })
+                            .fail(function (jqXHR, textStatus, errorThrown) {
+                                var errorString = (errorThrown === "") ?
+                                    "Error. " : errorThrown + " (" + jqXHR.status + "): ";
+                                errorString += (jqXHR.responseText === "") ?
+                                    "" : (jQuery.parseJSON(jqXHR.responseText).message) ?
+                                        jQuery.parseJSON(jqXHR.responseText).message :
+                                        jQuery.parseJSON(jqXHR.responseText).error.message;
+                                alert(errorString);
+                            });
                         tracker.stop();
                     }
                 }
             });
         };
+
+        function makeblob(dataURL) {
+            var BASE64_MARKER = ';base64,';
+            var parts = dataURL.split(BASE64_MARKER);
+            var contentType = parts[0].split(':')[1];
+            var raw = window.atob(parts[1]);
+            var rawLength = raw.length;
+            var uInt8Array = new Uint8Array(rawLength);
+            for (var i = 0; i < rawLength; ++i) {
+                uInt8Array[i] = raw.charCodeAt(i);
+            }
+            return new Blob([uInt8Array], { type: contentType });
+        }
     </script>
 
 </body>
