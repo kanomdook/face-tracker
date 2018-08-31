@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Tracking Face</title>
+    <link rel="stylesheet" href="assets/demo.css">
+
+    <script src="tracking-min.js"></script>
+    <script src="data/face-min.js"></script>
+    <!-- <script src="../node_modules/dat.gui/build/dat.gui.min.js"></script> -->
+    <!-- <script src="assets/stats.min.js"></script> -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+
+    <style>
+        video,
+        canvas {
+            margin-left: 230px;
+            margin-top: 120px;
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+    <video id="video" width="320" height="240" preload autoplay loop muted></video>
+    <canvas id="canvas" width="320" height="240"></canvas>
+
+    <script>
+        window.onload = function () {
+            var video = document.getElementById('video');
+            var canvas = document.getElementById('canvas');
+            var context = canvas.getContext('2d');
+            var tracker = new tracking.ObjectTracker('face');
+            tracker.setInitialScale(4);
+            tracker.setStepSize(2);
+            tracker.setEdgesDensity(0.1);
+            tracking.track('#video', tracker, { camera: true });
+            tracker.on('track', function (event) {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                event.data.forEach(function (rect) {
+                    context.strokeStyle = '#a64ceb';
+                    context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+                    context.font = '11px Helvetica';
+                    context.fillStyle = "#fff";
+                    context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
+                    context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
+                });
+                if (event.data.length > 0) {
+                    var _video = document.getElementById('video');
+                    var _canvas = document.createElement('canvas');
+                    if (_video) {
+                        _canvas.height = _video.videoHeight;
+                        _canvas.width = _video.videoWidth;
+                        var ctx = _canvas.getContext('2d');
+                        ctx.drawImage(_video, 0, 0, _canvas.width, _canvas.height);
+                        var img = new Image();
+                        img.src = _canvas.toDataURL("image/jpeg", 0.75);
+                        console.log(img.src);
+                        var uriBase = 'https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups?top=1000';
+                        $.ajax({
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Ocp-Apim-Subscription-Key': '46547dfcc3d3423c94cce3949093462b'
+                            },
+                            type: 'GET',
+                            url: uriBase,
+                            data: {},
+                            success: function (res) {
+                                // tracker.run();
+                                console.log(res);
+                            },
+                            dataType: 'json'
+                        });
+                        tracker.stop();
+                    }
+                }
+            });
+        };
+    </script>
+
+</body>
+
+</html>
