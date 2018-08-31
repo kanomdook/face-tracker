@@ -1,0 +1,27 @@
+{
+  "name": "tracker",
+  "version": "1.0.0",
+  "description": "tracking",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": "8.11.3",
+    "npm": "5.6.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kanomdook/face-tracker.git"
+  },
+  "author": "dook",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kanomdook/face-tracker/issues"
+  },
+  "homepage": "https://github.com/kanomdook/face-tracker#readme",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
